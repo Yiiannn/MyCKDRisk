@@ -1,3 +1,5 @@
+
+
 # -*- coding: utf-8 -*-
 """
 Created on Wed Jan 14 15:19:10 2026
@@ -19,7 +21,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 自定义CSS样式 - 更简洁的版本
+# 自定义CSS样式
 st.markdown("""
 <style>
     /* 主标题样式 */
@@ -212,7 +214,57 @@ if "step" not in st.session_state:
 if "form_data" not in st.session_state:
     st.session_state.form_data = {}
 
-# 模型配置（保持不变）
+
+# 风险指示器函数 - 移到顶部，使所有地方都能使用
+def create_gradient_gauge(value_percent, title="CKD风险评分"):
+    """创建渐变颜色的仪表盘"""
+
+    fig = go.Figure(go.Indicator(
+        mode="gauge+number",
+        value=value_percent,
+        domain={'x': [0, 1], 'y': [0, 1]},
+        title={'text': title, 'font': {'size': 24, 'color': '#2c3e50'}},
+        gauge={
+            'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "#34495e"},
+            'bar': {'color': "#2c3e50"},
+            'bgcolor': "white",
+            'borderwidth': 2,
+            'bordercolor': "#bdc3c7",
+            # 平滑渐变效果
+            'steps': [
+                {'range': [0, 10], 'color': 'rgba(0, 255, 0, 0.3)'},
+                {'range': [10, 20], 'color': 'rgba(64, 255, 0, 0.35)'},
+                {'range': [20, 30], 'color': 'rgba(128, 255, 0, 0.4)'},
+                {'range': [30, 40], 'color': 'rgba(192, 255, 0, 0.45)'},
+                {'range': [40, 50], 'color': 'rgba(255, 255, 0, 0.5)'},
+                {'range': [50, 60], 'color': 'rgba(255, 192, 0, 0.55)'},
+                {'range': [60, 70], 'color': 'rgba(255, 128, 0, 0.6)'},
+                {'range': [70, 80], 'color': 'rgba(255, 64, 0, 0.65)'},
+                {'range': [80, 90], 'color': 'rgba(255, 32, 0, 0.7)'},
+                {'range': [90, 100], 'color': 'rgba(255, 0, 0, 0.75)'}
+            ],
+            'threshold': {
+                'line': {'color': "#2c3e50", 'width': 4},
+                'thickness': 0.85,
+                'value': value_percent
+            }
+        },
+        number={
+            'font': {'size': 40, 'color': '#2c3e50'}
+        }
+    ))
+
+    fig.update_layout(
+        height=350,
+        margin=dict(t=50, b=50, l=50, r=50),
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)'
+    )
+
+    return fig
+
+
+# 模型配置
 MODEL_CONFIG = {
     ("中国 China", "高血压 Hypertension"): {
         "model_path": "CHyp_LR_model.sav",
@@ -376,50 +428,18 @@ def create_progress_bar():
 
 
 # 侧边栏
-#with st.sidebar:
-#    st.markdown("## 🏥 CKD风险评估工具")
-#    st.markdown("---")
-
-#    st.markdown("### ℹ️ 使用说明")
-    #with st.expander("点击查看详细信息"):
-    
-#    st.markdown("""
-#        📊 本工具可以帮助您：\nOur tool can help you:\n\n
-#        - 评估慢性肾脏疾病风险\nAssess the risk of chronic kidney disease\n\n
-#        - 获得个性化建议\nReceive personalized suggestions\n\n
-
-#        📞 注意事项：\nNotes:\n\n
-#        - 结果仅供参考\nThe result is for reference only\n\n
-#        - 不能替代专业医疗建议\nCannot replace professional medical advice\n\n
-#        - 如有不适请及时就医\nIf you feel unwell, please seek medical attention immediately\n\n
-#        """)
-
-    #st.markdown("### 📊 关于模型")
-    #st.markdown("基于机器学习算法开发，经过临床数据验证")
-
-    #st.markdown("### 📞 紧急联系")
-    #st.markdown("如有紧急情况，请立即联系：")
-    #st.markdown("- 🚑 急救电话: 120")
-    #st.markdown("- 📱 健康热线: 12320")
-
-#    st.markdown("---")
-#    st.markdown("*版本 1.0 | 2026*")
-
-# 侧边栏
-# 侧边栏
-# 侧边栏
 with st.sidebar:
-    # 顶部标题 - 学术期刊专业配色方案
+    # 顶部标题 - 渐变色
     st.markdown("""
     <div style="text-align: center; padding: 1.5rem; 
-                background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); 
-                color: white; border-radius: 0 0 15px 15px; margin-bottom: 2rem; 
-                box-shadow: 0 4px 12px rgba(44, 62, 80, 0.15);
-                border-bottom: 3px solid #3498db;">
-        <div style="background: rgba(52, 152, 219, 0.2); width: 60px; height: 60px; 
+                background: linear-gradient(135deg, #13547a 0%, #80d0c7 100%); 
+                color: white; border-radius: 10px; margin-bottom: 1.5rem; 
+                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+                border-bottom: 3px solid #13547a;">
+        <div style="background: rgba(255,255,255,0.2); width: 60px; height: 60px; 
                     border-radius: 50%; display: flex; align-items: center; 
                     justify-content: center; margin: 0 auto 1rem; 
-                    border: 2px solid rgba(52, 152, 219, 0.4);">
+                    border: 2px solid rgba(255,255,255,0.3);">
             <span style="font-size: 1.8rem; color: white;">🏥</span>
         </div>
         <h2 style="color: white; margin-bottom: 0.3rem; font-size: 1.3rem; font-weight: 700; 
@@ -429,16 +449,23 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-    # 使用说明部分
+    # 使用说明卡片 - 添加渐变背景
+    #st.markdown("""
+    #<div style="background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+    #            padding: 1.5rem; border-radius: 10px; margin-bottom: 1.5rem;
+     #           box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #d4dae6;">
+    #""", unsafe_allow_html=True)
+
     st.markdown("### ℹ️ 使用说明")
 
-    # 学术风格卡片容器
-    st.markdown("""
-    <div style="background: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; 
-                box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e0e0e0;">
-    """, unsafe_allow_html=True)
+    # 在这里添加其他使用说明内容
+    # st.markdown("1. 第一步说明...")
+    # st.markdown("2. 第二步说明...")
 
-    # 工具功能部分 - 使用更学术的排版
+    # 最后闭合div
+    #st.markdown('</div>', unsafe_allow_html=True)
+
+    # 工具功能部分
     st.markdown("""
     <div style="margin-bottom: 1.2rem;">
         <p style="font-weight: 600; color: #2c3e50; margin-bottom: 0.5rem; font-size: 0.95rem;">
@@ -455,7 +482,7 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-    # 注意事项部分 - 学术风格的警告框
+    # 注意事项部分
     st.markdown("""
     <div style="background: #f9f9f9; padding: 1rem; border-radius: 6px; border-left: 4px solid #e74c3c;">
         <p style="font-weight: 600; color: #2c3e50; margin-bottom: 0.5rem; font-size: 0.95rem;">
@@ -475,15 +502,16 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)  # 关闭使用说明卡片
 
-    # 版本信息 - 简洁学术风格
+    # 版本信息
     st.markdown("---")
     st.markdown("""
     <div style="text-align: center; padding: 1.2rem; 
-                background: #f8f9fa; border-radius: 8px; margin-top: 1rem;
-                color: #2c3e50; border: 1px solid #e9ecef;">
-        <div style="display: inline-block; background: #3498db; 
+                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+                border-radius: 10px; margin-top: 1rem;
+                color: #2c3e50; border: 1px solid #dee2e6;">
+        <div style="display: inline-block; background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); 
                     color: white; padding: 0.4rem 1.2rem; border-radius: 20px; 
                     font-size: 0.85rem; font-weight: 600; margin-bottom: 0.8rem;">
             🔬 v1.0 | 2026
@@ -502,7 +530,7 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 # 主标题
-st.markdown('<h1 class="main-header">🏥 中老年三高患者慢性肾脏疾病风险评估工具</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="main-header">🏥 中老年三高患者慢性肾脏疾病风险评估</h1>', unsafe_allow_html=True)
 st.markdown(
     '<p class="sub-header">Web-based tool for assessing the risk of chronic kidney disease in middle-aged and elderly patients with hypertension, diabetes, and hyperlipidemia</p>',
     unsafe_allow_html=True)
@@ -511,24 +539,34 @@ st.markdown(
 create_progress_bar()
 
 # 主内容区域
+# 步骤1：选择国家
 if st.session_state.step == 1:
     st.markdown('<h2 class="step-header">📋 第一步：选择国家 First step:Select country</h2>', unsafe_allow_html=True)
 
-    st.markdown('<div class="info-box">🌍 请选择您所在的国家，系统将为您匹配相应的评估模型\nPlease select your country, and the system will match the corresponding assessment model for you.</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="info-box">🌍 请选择您所在的国家，系统将为您匹配相应的评估模型<br>Please select your country, and the system will match the corresponding assessment model for you.</div>',
+        unsafe_allow_html=True)
 
-    # 使用列布局
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        # 创建卡片效果
+        # 使用st.container()创建卡片
         with st.container():
-            st.markdown(
-                '<div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">',
-                unsafe_allow_html=True)
+            # 添加白色背景
+            #st.markdown(
+                #'<div style="background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e0e0e0; margin-bottom: 1.5rem;">',
+                #unsafe_allow_html=True)
+
+            # 标题放在白色背景内
+            st.markdown("### 请选择您的国家\n\nPlease select your country")
+
+            # 隐藏标签的单选按钮
             country = st.radio(
-                "### 请选择您的国家 Please select your country",
+                "选择国家 / Select Country",  # 这个标签会被隐藏
                 ["中国 China", "美国 USA"],
-                index=None
+                index=None,
+                label_visibility="collapsed"  # 隐藏标签
             )
+
             st.markdown('</div>', unsafe_allow_html=True)
 
             if st.button("下一步 ➔\nNext", type="primary", use_container_width=True):
@@ -539,23 +577,31 @@ if st.session_state.step == 1:
                     st.session_state.step = 2
                     st.rerun()
 
+# 步骤2：选择疾病 - 添加缺失的代码
 elif st.session_state.step == 2:
     st.markdown('<h2 class="step-header">💊 第二步：选择疾病 Step 2: Select the disease</h2>', unsafe_allow_html=True)
 
-    st.markdown(f'<div class="info-box">👤 您选择的国家The country you have selected: <strong>{st.session_state.country}</strong></div>',
-                unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="info-box">👤 您选择的国家The country you have selected: <strong>{st.session_state.country}</strong></div>',
+        unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         with st.container():
-            st.markdown(
-                '<div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">',
-                unsafe_allow_html=True)
+            st.markdown("### 请选择您的主要疾病\n\nPlease select your primary disease")
+           # st.markdown(
+               # f'<div style="margin-bottom: 1.5rem; color: #7f8c8d; font-size: 0.95rem;">当前国家: {st.session_state.country}<br>选择您患有的主要疾病类型<br>Select the main type of disease you are suffering from</div>',
+               # unsafe_allow_html=True)
+
+            # 添加白色背景
+            #st.markdown(
+                #'<div style="background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e0e0e0; margin-bottom: 1.5rem;">',
+                #unsafe_allow_html=True)
             group = st.radio(
-                "### 请选择您的主要疾病Please select your primary disease",
+                "选择疾病 / Select Disease",
                 ["高血压 Hypertension", "糖尿病 Diabetes", "血脂异常 Dyslipidemia"],
                 index=None,
-                help="选择您患有的主要疾病类型 Select the main type of disease you are suffering from"
+                label_visibility="collapsed"
             )
             st.markdown('</div>', unsafe_allow_html=True)
 
@@ -573,11 +619,13 @@ elif st.session_state.step == 2:
                         st.session_state.step = 3
                         st.rerun()
 
+# 步骤3：填写健康信息
 elif st.session_state.step == 3:
     country = st.session_state.country
     group = st.session_state.group
 
-    st.markdown('<h2 class="step-header">📝 第三步：填写健康信息 Step 3: Fill in health information</h2>', unsafe_allow_html=True)
+    st.markdown('<h2 class="step-header">📝 第三步：填写健康信息 Step 3: Fill in health information</h2>',
+                unsafe_allow_html=True)
 
     st.markdown(f"""
     <div class="info-box">
@@ -596,7 +644,6 @@ elif st.session_state.step == 3:
     col1, col2 = st.columns(2)
 
     with col1:
-        #st.markdown("### 基本信息 Basic information")
         st.markdown('<h3 class="section-header">👤 基本信息 Basic information</h3>', unsafe_allow_html=True)
         if "rgender" in need_features:
             st.markdown('<div class="feature-label">请选择您的性别</div>', unsafe_allow_html=True)
@@ -621,8 +668,7 @@ elif st.session_state.step == 3:
             st.markdown('<div class="feature-label">请选择您的年龄</div>', unsafe_allow_html=True)
             age = st.slider("Please select your age", 45, 120, 60, key="age_slider")
             input_dict["age_cul"] = age
-            st.caption(f"当前年龄 Current age: {age} ")
-
+            st.caption(f"当前年龄 Current age: {age}")
 
         if "bmi" in need_features:
             st.markdown('<div class="feature-label">请选择您的BMI</div>', unsafe_allow_html=True)
@@ -637,13 +683,13 @@ elif st.session_state.step == 3:
             st.caption(f"当前腰围 Current waist: {waist} cm")
 
     with col2:
-        #st.markdown("### 生理指标 Physical signs")
         st.markdown('<h3 class="section-header">📊 生理指标 Physical signs</h3>', unsafe_allow_html=True)
         if "mean_pulse" in need_features:
             st.markdown('<div class="feature-label">请选择您的平均脉搏 (次/分钟)</div>', unsafe_allow_html=True)
-            pulse = st.slider("Please select your average pulse rate (beats per minute)", 40, 220, 72, key="pulse_slider")
+            pulse = st.slider("Please select your average pulse rate (beats per minute)", 40, 220, 72,
+                              key="pulse_slider")
             input_dict["mean_pulse"] = pulse
-            st.caption(f"当前脉搏 Current pulse: {pulse} ")
+            st.caption(f"当前脉搏 Current pulse: {pulse}")
 
         if "max_respiration" in need_features:
             st.markdown('<div class="feature-label">请选择您的最大呼气流速</div>', unsafe_allow_html=True)
@@ -659,11 +705,11 @@ elif st.session_state.step == 3:
 
         if "mean_handgrip_right" in need_features:
             st.markdown('<div class="feature-label">请选择您的右手平均握力 (kg)</div>', unsafe_allow_html=True)
-            grip_right = st.slider("Please select your mean right hand grip strength", 0, 80, 32, key="grip_right_slider")
+            grip_right = st.slider("Please select your mean right hand grip strength", 0, 80, 32,
+                                   key="grip_right_slider")
             input_dict["mean_handgrip_right"] = grip_right
             st.caption(f"当前右手握力 Current mean right hand grip strength: {grip_right} kg")
 
-    # 健康问题部分
     # 健康问题部分
     st.markdown('<h3 class="section-header">🩺 健康状况 Health status</h3>', unsafe_allow_html=True)
     cols = st.columns(2)
@@ -673,7 +719,8 @@ elif st.session_state.step == 3:
         ("depression", "您患有抑郁相关疾病吗？", "Do you have depression?", ['是(Yes)', '否(No)']),
         ("da033", "您的远距离视力怎么样？", "How is your eyesight for seeing things at a distance?",
          ['极好(Excellent)', '很好(Very good)', '好(Good)', '一般(Fair)', '不好(Poor)']),
-        ("da081", "您认为自己活到预期年龄的可能性怎么样?", "How do you think your chances of living to the expected age are?",
+        ("da081", "您认为自己活到预期年龄的可能性怎么样?",
+         "How do you think your chances of living to the expected age are?",
          ['几乎不可能(Almost impossible)', '不太可能(Not very likely)', '可能(Maybe)', '非常可能(Very likely)',
           '几乎肯定(Almost certain)']),
         ("da069", "您现在喝酒吗？", "Do you drink alcohol now?", ['是(Yes)', '否(No)']),
@@ -766,29 +813,8 @@ elif st.session_state.step == 3:
                         </div>
                         """, unsafe_allow_html=True)
 
-                        # 创建风险指示器
-                        fig = go.Figure(go.Indicator(
-                            mode="gauge+number",
-                            value=prob * 100,
-                            domain={'x': [0, 1], 'y': [0, 1]},
-                            title={'text': "CKD风险评分\nCKD Risk score", 'font': {'size': 24}},
-                            gauge={
-                                'axis': {'range': [0, 100], 'tickwidth': 1},
-                                'bar': {'color': "red"},
-                                'steps': [
-                                    {'range': [0, 30], 'color': "lightgreen"},
-                                    {'range': [30, 70], 'color': "yellow"},
-                                    {'range': [70, 100], 'color': "red"}
-                                ],
-                                'threshold': {
-                                    'line': {'color': "black", 'width': 4},
-                                    'thickness': 0.75,
-                                    'value': 50
-                                }
-                            },
-                            number={'font': {'size': 40}}
-                        ))
-                        fig.update_layout(height=300, margin=dict(t=50, b=0))
+                        # 高风险的风险指示器
+                        fig = create_gradient_gauge(prob * 100, "CKD风险评分\nCKD Risk Score")
                         st.plotly_chart(fig, use_container_width=True)
 
                     else:
@@ -809,29 +835,8 @@ elif st.session_state.step == 3:
                         </div>
                         """, unsafe_allow_html=True)
 
-                        # 创建风险指示器
-                        fig = go.Figure(go.Indicator(
-                            mode="gauge+number",
-                            value=prob * 100,
-                            domain={'x': [0, 1], 'y': [0, 1]},
-                            title={'text': "CKD风险评分\nCKD Risk score", 'font': {'size': 24}},
-                            gauge={
-                                'axis': {'range': [0, 100], 'tickwidth': 1},
-                                'bar': {'color': "green"},
-                                'steps': [
-                                    {'range': [0, 30], 'color': "lightgreen"},
-                                    {'range': [30, 70], 'color': "yellow"},
-                                    {'range': [70, 100], 'color': "red"}
-                                ],
-                                'threshold': {
-                                    'line': {'color': "black", 'width': 4},
-                                    'thickness': 0.75,
-                                    'value': 50
-                                }
-                            },
-                            number={'font': {'size': 40}}
-                        ))
-                        fig.update_layout(height=300, margin=dict(t=50, b=0))
+                        # 低风险的风险指示器
+                        fig = create_gradient_gauge(prob * 100, "CKD风险评分\nCKD Risk Score")
                         st.plotly_chart(fig, use_container_width=True)
 
                     # 免责声明
