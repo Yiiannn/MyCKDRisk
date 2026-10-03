@@ -790,7 +790,8 @@ elif st.session_state.step == 3:
                         model = pickle.load(f)
 
                     prob = model.predict_proba(X)[0][1]
-                    result = int(prob >= 0.5)
+                    #result = int(prob >= 0.5)
+                    result = int(prob >= (0.20 if country == "中国 China" else 0.30))
 
                     # 显示结果
                     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
